@@ -1,1 +1,4 @@
-__author__ = 'Chris'
+from PIL import Image, ImageFilter
+
+def analyzeSquare(square):
+    print "analyze sqare"
