@@ -1,54 +1,16 @@
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageDraw
 import pickle
 import random
-
-width = raw_input('input image width: ')
-height = raw_input('input image height: ')
-
-with open('graph.pk1', 'rb') as graphFile:
-    G = pickle.load(graphFile)
-    print 'balls'
-
-    im = Image.new('P', (width, height))
-    im.convert('P', palette=G.palette, colors=10)
-    pixels = im.load()
-
-    currentState = 0
-
-    for y in range(0, height):
-        for x in range(0, width):
-            pixels[x, y] = currentState
-
-            if x+1 < width and y > 0:
-                # not furthest right or top row
-                leftState = pixels[x, y]
-                topState = pixels[x+1, y-1]
-                listOfStateProb = findStateProbabilities(leftState, topState)
-
-
-            elif x+1 < width:
-                # not furthest right but is top row
-                print ''
-
-            elif y > 0:
-                # not the top row but futhest right
-                print ''
-
-            else:
-                #furthest right and top row
-                print ''
-
-            pixels[x,y] = currentState
 
 
 def findNextState(stateProbabilities):
     randomFloat = random.random()
     for i in range(len(stateProbabilities)):
-        if stateProbabilities[i].getFloat() > 0:
-            if stateProbabilities[i].getFloat() > randomFloat:
+        if stateProbabilities[i]['weight'].getFloat() > 0:
+            if stateProbabilities[i]['weight'].getFloat() > randomFloat:
                 return i
             else:
-                randomFloat = randomFloat - stateProbabilities[i].getFloat()
+                randomFloat = randomFloat - stateProbabilities[i]['weight'].getFloat()
 
 
 def findStateIndex(state, Graph):
@@ -57,15 +19,17 @@ def findStateIndex(state, Graph):
             return i
 
 
-def findStateProbabilities(left, top):
+def findStateProbabilities(left, top, G):
     leftList = []
     topList = []
     totalList = []
 
     if left is not None:
-        leftList = left.right
+        i = findStateIndex(left, G)
+        leftList = G.listOfNodes[i].right
     if top is not None:
-        topList = top.bottom
+        i = findStateIndex(top, G)
+        topList = G.listOfNodes[i].bottom
 
     if len(leftList) == 0 or len(topList) == 0:
         if len(leftList) == 0:
@@ -86,3 +50,36 @@ def findStateProbabilities(left, top):
             totalList.append({'node': tempNode, 'weight': tempWeight})
 
     return totalList
+
+
+width = int(raw_input('input image width: '))
+height = int(raw_input('input image height: '))
+
+with open('graph.pk1', 'rb') as graphFile:
+    G = pickle.load(graphFile)
+
+    im = Image.new('P', (int(width), int(height)))
+    im.convert('P', palette=G.palette, colors=10)
+    pixels = im.load()
+
+    currentState = 0
+
+    for y in range(0, height):
+        for x in range(0, width):
+            pixels[x, y] = currentState
+
+            if x+1 < width and y > 0:
+                # not furthest right or top row
+                leftState = pixels[x, y]
+                topState = pixels[x+1, y-1]
+                listOfStateProb = findStateProbabilities(leftState, topState, G)
+
+            elif x+1 < width:
+                # not furthest right but is top row
+                leftState = pixels[x, y]
+                listOfStateProb = findStateProbabilities(leftState, None, G)
+
+            currentState = findNextState(listOfStateProb)
+
+    im.paste(pixels, (0, 0, width, height))
+    im.show()

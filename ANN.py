@@ -22,6 +22,9 @@ class Rational:
         else:
             self.initialized = True
 
+    def getFloat(self):
+        return float(self.numerator)/float(self.denominator)
+
 
 class AnnGraph:
     def __init__(self):
@@ -43,8 +46,7 @@ class AnnGraph:
     def loadGraph(self, graphName):
         print "load graph.pk1"
 
-    def getFloat(self):
-        return float(self.numerator)/float(self.denominator)
+
 
 
 
