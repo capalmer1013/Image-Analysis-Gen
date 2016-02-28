@@ -5,6 +5,7 @@ filename = raw_input('enter image filename to learn: ')
 
 im = Image.open(filename, 'r')
 im = im.convert('P', palette=Image.ADAPTIVE, colors=10)
+colors = im.getcolors()
 im.show()
 
 for i in range(0, im.height):
@@ -27,3 +28,6 @@ for i in range(0, im.height):
             right = None
 
         analyze.analyzePixel(im.getpixel((j, i)), left, top, right, bottom)
+
+analyze.G.palette = im.palette
+analyze.G.saveGraph('graph.pk1')

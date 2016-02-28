@@ -1,4 +1,5 @@
 from PIL import Image, ImageFilter
+import pickle
 
 class Rational:
     def __init__(self):
@@ -24,11 +25,11 @@ class Rational:
 
 class AnnGraph:
     def __init__(self):
+        self.colorList = []
         self.listOfNodes = []
-        self.dictOfEdges = {}
+        self.palette = ''
 
     def addNode(self, node):
-
         self.listOfNodes.append(node)
 
     def addEdge(self, fromNode, toNode, weight, direction):
@@ -36,9 +37,14 @@ class AnnGraph:
         self.dictOfEdges[indexString] = {'fromNode': fromNode, 'toNode': toNode, 'weight': weight, 'direction': direction}
 
     def saveGraph(self, graphName):
-        print "save graph"
+        with open('graph.pk1', 'wb') as graphFile:
+            pickle.dump(self, graphFile)
+
     def loadGraph(self, graphName):
-        print "load graph"
+        print "load graph.pk1"
+
+    def getFloat(self):
+        return float(self.numerator)/float(self.denominator)
 
 
 
